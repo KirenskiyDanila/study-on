@@ -19,14 +19,20 @@ class LessonType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'required' => true,
-                'constraints' => [new Length(['min' => 3, 'max'=>255])]
+                'label' => 'Название',
+                'constraints' => [new Length(['min' => 3, 'max'=>255])],
+                'attr' => ['class ' => 'form-control']
             ])
             ->add('content', TextareaType::class, [
                 'required' => true,
-                'constraints' => [new Length(['min' => 3, 'max'=>255])]
+                'label' => 'Содержимое',
+                'constraints' => [new Length(['min' => 3, 'max'=>255])],
+                'attr' => ['class ' => 'form-control']
             ])
             ->add('serialNumber', IntegerType::class, [
                 'required' => true,
+                'label' => 'Порядковый номер',
+                'attr' => ['class ' => 'form-control mb-2']
             ])
             ->add('course', HiddenType::class)
         ;

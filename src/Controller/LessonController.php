@@ -14,14 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/lessons')]
 class LessonController extends AbstractController
 {
-    #[Route('/', name: 'app_lesson_index', methods: ['GET'])]
-    public function index(LessonRepository $lessonRepository): Response
-    {
-        return $this->render('lesson/index.html.twig', [
-            'lessons' => $lessonRepository->findAll(),
-        ]);
-    }
-
     #[Route('/new/{id}', name: 'app_lesson_new', methods: ['GET', 'POST'])]
     public function new(Request $request, int $id, LessonRepository $lessonRepository, CourseRepository $courseRepository): Response
     {
@@ -31,6 +23,7 @@ class LessonController extends AbstractController
         $lesson->setCourse($courseRepository->find(['id' => $id]));
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $lessonRepository->checkSerialNumber($lesson);
             $lessonRepository->save($lesson, true);
 
             return $this->redirectToRoute('app_course_show', ['id' => $lesson->getCourse()->getId()], Response::HTTP_SEE_OTHER);
@@ -57,6 +50,7 @@ class LessonController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $lessonRepository->checkSerialNumber($lesson);
             $lessonRepository->save($lesson, true);
 
             return $this->redirectToRoute('app_lesson_index', [], Response::HTTP_SEE_OTHER);

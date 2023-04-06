@@ -11,7 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Lesson|null find($id, $lockMode = null, $lockVersion = null)
  * @method Lesson|null findOneBy(array $criteria, array $orderBy = null)
- * @method Lesson[]    findAll()
  * @method Lesson[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class LessonRepository extends ServiceEntityRepository
@@ -37,6 +36,34 @@ class LessonRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findAll(): array
+    {
+        return $this->findBy(array(), array('serialNumber' => 'ASC'));
+    }
+
+    public function checkSerialNumber(Lesson $entity) : void
+    {
+        $lessons = $this->findAll();
+        $serialNumber = $entity->getSerialNumber();
+        $highestNumber = 0;
+        foreach ($lessons as $lesson) {
+            if ($serialNumber <= $lesson->getSerialNumber()) {
+                $lesson->setSerialNumber($lesson->getSerialNumber() + 1);
+            }
+            if ($highestNumber < $lesson->getSerialNumber()) {
+                $highestNumber = $lesson->getSerialNumber();
+            }
+        }
+        if ($serialNumber < 1) {
+            $serialNumber = 1;
+        }
+        else if ($serialNumber > $highestNumber) {
+            $serialNumber = $highestNumber + 1;
+        }
+        $entity->setSerialNumber($serialNumber);
+
     }
 
 //    /**

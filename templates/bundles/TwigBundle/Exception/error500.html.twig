@@ -1,0 +1,13 @@
+{# templates/bundles/TwigBundle/Exception/error404.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>ОШИБКА СО СТОРОНЫ СЕРВЕРА!</h1>
+
+        <p class="h3">
+            У сайта возникли технические неполадки!
+            Попробуйте перейти на <a href="{{ path('app_course_index') }}">главную страницу</a>.
+        </p>
+    </div>
+{% endblock %}

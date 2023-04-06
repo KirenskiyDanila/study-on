@@ -1,0 +1,13 @@
+{# templates/bundles/TwigBundle/Exception/error404.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+    <h1>СТРАНИЦА НЕ НАЙДЕНА!</h1>
+
+    <p class="h3">
+        Такой страницы не существует. Перепроверьте
+        адрес или перейдите на <a href="{{ path('app_course_index') }}">главную страницу</a>.
+    </p>
+    </div>
+{% endblock %}
