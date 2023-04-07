@@ -44,6 +44,7 @@ class CourseController extends AbstractController
     #[Route('/{id}', name: 'app_course_show', methods: ['GET'])]
     public function show(Course $course): Response
     {
+
         return $this->render('course/show.html.twig', [
             'course' => $course,
         ]);
@@ -58,9 +59,8 @@ class CourseController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $courseRepository->save($course, true);
 
-            return $this->redirectToRoute('app_course_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_course_show', ['id' => $course->getId()], Response::HTTP_SEE_OTHER);
         }
-
         return $this->renderForm('course/edit.html.twig', [
             'course' => $course,
             'form' => $form,

@@ -34,7 +34,10 @@ class LessonType extends AbstractType
                 'label' => 'Порядковый номер',
                 'attr' => ['class ' => 'form-control mb-2']
             ])
-            ->add('course', HiddenType::class)
+            ->add('course', HiddenType::class, [
+                'data' => null,
+                'disabled' => true
+            ])
         ;
     }
 

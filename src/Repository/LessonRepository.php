@@ -45,14 +45,15 @@ class LessonRepository extends ServiceEntityRepository
 
     public function checkSerialNumber(Lesson $entity) : void
     {
-        $lessons = $this->findAll();
+        $course = $entity->getCourse();
+        $lessons = $course->getLessons();
         $serialNumber = $entity->getSerialNumber();
         $highestNumber = 0;
         foreach ($lessons as $lesson) {
-            if ($serialNumber <= $lesson->getSerialNumber()) {
+            if ($serialNumber <= $lesson->getSerialNumber() && $entity !== $lesson) {
                 $lesson->setSerialNumber($lesson->getSerialNumber() + 1);
             }
-            if ($highestNumber < $lesson->getSerialNumber()) {
+            if ($highestNumber < $lesson->getSerialNumber() && $entity !== $lesson) {
                 $highestNumber = $lesson->getSerialNumber();
             }
         }
@@ -63,7 +64,17 @@ class LessonRepository extends ServiceEntityRepository
             $serialNumber = $highestNumber + 1;
         }
         $entity->setSerialNumber($serialNumber);
+    }
 
+    public function moveSerialNumbers(Lesson $entity, int $oldSerialNumber) : void
+    {
+        $course = $entity->getCourse();
+        $lessons = $course->getLessons();
+        foreach ($lessons as $lesson) {
+            if ($oldSerialNumber <= $lesson->getSerialNumber() && $entity !== $lesson) {
+                $lesson->setSerialNumber($lesson->getSerialNumber() - 1);
+            }
+        }
     }
 
 //    /**

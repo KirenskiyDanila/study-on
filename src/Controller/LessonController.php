@@ -46,14 +46,18 @@ class LessonController extends AbstractController
     #[Route('/{id}/edit', name: 'app_lesson_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Lesson $lesson, LessonRepository $lessonRepository): Response
     {
+        $course = $lesson->getCourse();
+        $oldSerialNumber = $lesson->getSerialNumber();
         $form = $this->createForm(LessonType::class, $lesson);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $lessonRepository->moveSerialNumbers($lesson, $oldSerialNumber);
             $lessonRepository->checkSerialNumber($lesson);
+            $lesson->setCourse($course);
             $lessonRepository->save($lesson, true);
 
-            return $this->redirectToRoute('app_lesson_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_lesson_show', ['id' => $lesson->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('lesson/edit.html.twig', [
@@ -67,6 +71,7 @@ class LessonController extends AbstractController
     {
         $id = $lesson->getCourse()->getId();
         if ($this->isCsrfTokenValid('delete'.$lesson->getId(), $request->request->get('_token'))) {
+            $lessonRepository->moveSerialNumbers($lesson, $lesson->getSerialNumber());
             $lessonRepository->remove($lesson, true);
         }
 
