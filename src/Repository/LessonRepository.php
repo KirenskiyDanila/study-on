@@ -59,8 +59,7 @@ class LessonRepository extends ServiceEntityRepository
         }
         if ($serialNumber < 1) {
             $serialNumber = 1;
-        }
-        else if ($serialNumber > $highestNumber) {
+        } elseif ($serialNumber > $highestNumber) {
             $serialNumber = $highestNumber + 1;
         }
         $entity->setSerialNumber($serialNumber);

@@ -4,7 +4,7 @@ namespace App\Tests;
 
 use App\Entity\Course;
 use App\Entity\Lesson;
-use App\Tests\AbstractTest;
+use Exception;
 
 class LessonTest extends AbstractTest
 {
@@ -13,6 +13,9 @@ class LessonTest extends AbstractTest
         parent::setUp();
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGetMethods(): void
     {
         $lessons = self::getEntityManager()->getRepository(Lesson::class)->findAll();
@@ -23,7 +26,6 @@ class LessonTest extends AbstractTest
             $urls[] = '/lessons/new/' . $lesson->getCourse()->getId();
             $urls[] = '/lessons/' . $lesson->getId() . '/edit';
             $urls[] = '/lessons/' . $lesson->getId();
-
         }
 
         foreach ($urls as $url) {
@@ -32,6 +34,9 @@ class LessonTest extends AbstractTest
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function test404Methods(): void
     {
         $lessons = self::getEntityManager()->getRepository(Lesson::class)->findAll();
@@ -49,6 +54,9 @@ class LessonTest extends AbstractTest
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGetCourseMethod(): void
     {
         $lessons = self::getEntityManager()->getRepository(Lesson::class)->findAll();
@@ -59,11 +67,14 @@ class LessonTest extends AbstractTest
     }
 
 
+    /**
+     * @throws Exception
+     */
     public function testAddLessonMethod(): void
     {
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $id = $course->getId();
-        $crawler = self::getClient()->request('GET', '/lessons/new/' . $id);
+        self::getClient()->request('GET', '/lessons/new/' . $id);
         $this->assertResponseCode(200);
         $count = count($course->getLessons());
 
@@ -98,11 +109,14 @@ class LessonTest extends AbstractTest
     }
 
 
+    /**
+     * @throws Exception
+     */
     public function testEditLessonMethod(): void
     {
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $lesson = $course->getLessons()[0];
-        $crawler = self::getClient()->request('GET', '/lessons/' . $lesson->getId() . '/edit');
+        self::getClient()->request('GET', '/lessons/' . $lesson->getId() . '/edit');
         $this->assertResponseCode(200);
 
         self::getClient()->submitForm('Редактировать', [
@@ -120,10 +134,10 @@ class LessonTest extends AbstractTest
             'lesson[serialNumber]' => '12345678'
         ]);
         $this->assertResponseCode(303);
-        $crawler = self::getClient()->followRedirect();
+        self::getClient()->followRedirect();
         $this->assertResponseOk();
-        $crawler = self::getClient()->getCrawler();
-        self::assertPageTitleContains( '123456 / '.$course->getName() .' / StudyOn');
+        self::getClient()->getCrawler();
+        self::assertPageTitleContains('123456 / '.$course->getName() .' / StudyOn');
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $lessons = $course->getLessons();
         $highestNumber = 0;
@@ -136,23 +150,29 @@ class LessonTest extends AbstractTest
         $this->assertEquals(count($course->getLessons()), $highestNumber);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testDeleteLessonMethod(): void
     {
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $count = count($course->getLessons());
         $lesson = $course->getLessons()[0];
-        $crawler = self::getClient()->request('GET', '/lessons/' . $lesson->getId());
+        self::getClient()->request('GET', '/lessons/' . $lesson->getId());
         $this->assertResponseCode(200);
 
         self::getClient()->submitForm('Удалить', []);
         $this->assertResponseCode(303);
-        $crawler = self::getClient()->followRedirect();
+        self::getClient()->followRedirect();
         $this->assertResponseOk();
-        self::assertPageTitleContains( $course->getName() . ' / StudyOn');
+        self::assertPageTitleContains($course->getName() . ' / StudyOn');
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $this->assertEquals(count($course->getLessons()), $count - 1);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testPostMethods(): void
     {
         $lessons = self::getEntityManager()->getRepository(Lesson::class)->findAll();
@@ -172,7 +192,6 @@ class LessonTest extends AbstractTest
         $urls = [];
         foreach ($lessons as $lesson) {
             $urls[] = '/lessons/' . $lesson->getId();
-
         }
 
         foreach ($urls as $url) {

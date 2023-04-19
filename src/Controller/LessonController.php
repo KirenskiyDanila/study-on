@@ -15,8 +15,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class LessonController extends AbstractController
 {
     #[Route('/new/{id}', name: 'app_lesson_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, int $id, LessonRepository $lessonRepository, CourseRepository $courseRepository): Response
-    {
+    public function new(
+        Request $request,
+        int $id,
+        LessonRepository $lessonRepository,
+        CourseRepository $courseRepository
+    ): Response {
         $lesson = new Lesson();
         $form = $this->createForm(LessonType::class, $lesson);
         $form->handleRequest($request);
@@ -26,7 +30,11 @@ class LessonController extends AbstractController
             $lessonRepository->checkSerialNumber($lesson);
             $lessonRepository->save($lesson, true);
 
-            return $this->redirectToRoute('app_course_show', ['id' => $lesson->getCourse()->getId()], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute(
+                'app_course_show',
+                ['id' => $lesson->getCourse()->getId()],
+                Response::HTTP_SEE_OTHER
+            );
         }
 
         return $this->renderForm('lesson/new.html.twig', [

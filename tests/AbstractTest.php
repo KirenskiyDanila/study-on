@@ -8,12 +8,11 @@ use App\DataFixtures\AppFixtures;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Loader;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
-use App\Entity\Course;
-use App\Entity\Lesson;
 
 abstract class AbstractTest extends WebTestCase
 {
@@ -46,6 +45,7 @@ abstract class AbstractTest extends WebTestCase
 
     /**
      * Shortcut
+     * @throws Exception
      */
     protected static function getEntityManager()
     {
@@ -63,7 +63,7 @@ abstract class AbstractTest extends WebTestCase
     /**
      * Load fixtures before test
      */
-    protected function loadFixtures(array $fixtures = [])
+    protected function loadFixtures(array $fixtures = []) : void
     {
         $loader = new Loader();
 
@@ -85,28 +85,44 @@ abstract class AbstractTest extends WebTestCase
         $executor->execute($loader->getFixtures());
     }
 
-    public function assertResponseOk(?Response $response = null, ?string $message = null, string $type = 'text/html')
-    {
+    public function assertResponseOk(
+        ?Response $response = null,
+        ?string $message = null,
+        string $type = 'text/html'
+    ) : void {
         $this->failOnResponseStatusCheck($response, 'isOk', $message, $type);
     }
 
-    public function assertResponseRedirect(?Response $response = null, ?string $message = null, string $type = 'text/html')
-    {
+    public function assertResponseRedirect(
+        ?Response $response = null,
+        ?string $message = null,
+        string $type = 'text/html'
+    ) : void {
         $this->failOnResponseStatusCheck($response, 'isRedirect', $message, $type);
     }
 
-    public function assertResponseNotFound(?Response $response = null, ?string $message = null, string $type = 'text/html')
-    {
+    public function assertResponseNotFound(
+        ?Response $response = null,
+        ?string $message = null,
+        string $type = 'text/html'
+    ) : void {
         $this->failOnResponseStatusCheck($response, 'isNotFound', $message, $type);
     }
 
-    public function assertResponseForbidden(?Response $response = null, ?string $message = null, string $type = 'text/html')
-    {
+    public function assertResponseForbidden(
+        ?Response $response = null,
+        ?string $message = null,
+        string $type = 'text/html'
+    ) : void {
         $this->failOnResponseStatusCheck($response, 'isForbidden', $message, $type);
     }
 
-    public function assertResponseCode(int $expectedCode, ?Response $response = null, ?string $message = null, string $type = 'text/html')
-    {
+    public function assertResponseCode(
+        int $expectedCode,
+        ?Response $response = null,
+        ?string $message = null,
+        string $type = 'text/html'
+    ) : void {
         $this->failOnResponseStatusCheck($response, $expectedCode, $message, $type);
     }
     /**
@@ -115,7 +131,7 @@ abstract class AbstractTest extends WebTestCase
      *
      * @return string
      */
-    public function guessErrorMessageFromResponse(Response $response, string $type = 'text/html')
+    public function guessErrorMessageFromResponse(Response $response, string $type = 'text/html') : string
     {
         try {
             $crawler = new Crawler();
@@ -136,7 +152,7 @@ abstract class AbstractTest extends WebTestCase
             } else {
                 $title = $crawler->filter('title')->text();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $title = $e->getMessage();
         }
 
@@ -145,10 +161,10 @@ abstract class AbstractTest extends WebTestCase
 
     private function failOnResponseStatusCheck(
         Response $response = null,
-                 $func = null,
+        $func = null,
         ?string $message = null,
         string $type = 'text/html'
-    ) {
+    ) : void {
         if (null === $func) {
             $func = 'isOk';
         }
@@ -165,7 +181,7 @@ abstract class AbstractTest extends WebTestCase
             }
 
             return;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // nothing to do
         }
 

@@ -3,8 +3,7 @@
 namespace App\Tests;
 
 use App\Entity\Course;
-use App\Form\CourseType;
-use App\Tests\AbstractTest;
+use Exception;
 
 class CourseTest extends AbstractTest
 {
@@ -15,6 +14,9 @@ class CourseTest extends AbstractTest
     }
 
 
+    /**
+     * @throws Exception
+     */
     public function testGetMethods(): void
     {
         $courses = self::getEntityManager()->getRepository(Course::class)->findAll();
@@ -33,6 +35,9 @@ class CourseTest extends AbstractTest
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function test404Methods(): void
     {
         $courses = self::getEntityManager()->getRepository(Course::class)->findAll();
@@ -48,6 +53,9 @@ class CourseTest extends AbstractTest
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testIndexCourseMethod(): void
     {
         $courses = self::getEntityManager()->getRepository(Course::class)->findAll();
@@ -55,6 +63,9 @@ class CourseTest extends AbstractTest
         $this->assertCount(count($courses), $crawler->filter('.card'));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testGetCourseMethod(): void
     {
         $courses = self::getEntityManager()->getRepository(Course::class)->findAll();
@@ -64,10 +75,13 @@ class CourseTest extends AbstractTest
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAddCourseMethod(): void
     {
         $crawler = self::getClient()->request('GET', '/courses/');
-        $crawler = self::getClient()->click($crawler->filter('.btn')->selectLink('Создать новый курс')->link());
+        self::getClient()->click($crawler->filter('.btn')->selectLink('Создать новый курс')->link());
         $this->assertResponseCode(200);
 
         self::getClient()->submitForm('Добавить', [
@@ -91,10 +105,13 @@ class CourseTest extends AbstractTest
         $this->assertCount(count($courses), $crawler->filter('.card'));
     }
 
+    /**
+     * @throws Exception
+     */
     public function testEditCourseMethod(): void
     {
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
-        $crawler = self::getClient()->request('GET', '/courses/' . $course->getId() . '/edit');
+        self::getClient()->request('GET', '/courses/' . $course->getId() . '/edit');
         $this->assertResponseCode(200);
 
         self::getClient()->submitForm('Редактировать', [
@@ -111,27 +128,33 @@ class CourseTest extends AbstractTest
             'course[description]' => '12345678'
         ]);
         $this->assertResponseCode(303);
-        $crawler = self::getClient()->followRedirect();
+        self::getClient()->followRedirect();
         $this->assertResponseOk();
         self::assertPageTitleContains('123456 / StudyOn');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testDeleteCourseMethod(): void
     {
         $count = count(self::getEntityManager()->getRepository(Course::class)->findAll());
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
-        $crawler = self::getClient()->request('GET', '/courses/' . $course->getId());
+        self::getClient()->request('GET', '/courses/' . $course->getId());
         $this->assertResponseCode(200);
 
         self::getClient()->submitForm('Удалить', []);
         $this->assertResponseCode(303);
-        $crawler = self::getClient()->followRedirect();
+        self::getClient()->followRedirect();
         $this->assertResponseOk();
-        self::assertPageTitleContains( 'Список курсов / StudyOn');
+        self::assertPageTitleContains('Список курсов / StudyOn');
         $newCount = count(self::getEntityManager()->getRepository(Course::class)->findAll());
         $this->assertEquals($newCount, $count - 1);
     }
 
+    /**
+     * @throws Exception
+     */
     public function testPostMethods(): void
     {
         $courses = self::getEntityManager()->getRepository(Course::class)->findAll();
@@ -151,7 +174,6 @@ class CourseTest extends AbstractTest
 
         foreach ($courses as $course) {
             $urls[] = '/courses/' . $course->getId();
-
         }
 
         foreach ($urls as $url) {
