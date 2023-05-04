@@ -13,8 +13,6 @@ class BillingClient
      */
     public static function getToken(string $url, string $credentials, bool $register) : array
     {
-        var_dump(12312312315455);
-
         if ($register === true) {
             $uri = $url . 'api/v1/register';
         } else {

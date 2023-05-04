@@ -249,7 +249,7 @@ class UserTest extends AbstractTest
 //        );
 //        $client->submit($form);
 //        $this->assertResponseOk();
-//        self::assertPageTitleContains('Log in!');
+//        self::assertPageTitleContains('Register!');
 //    }
 //
 //    public function testBadEmailRegistration(): void
