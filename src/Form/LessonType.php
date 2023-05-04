@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class LessonType extends AbstractType
 {
@@ -20,19 +21,23 @@ class LessonType extends AbstractType
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Название',
-                'constraints' => [new Length(['min' => 3, 'max'=>255])],
+                'constraints' => [new Length(['min' => 3, 'max'=>255]),
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
                 'attr' => ['class ' => 'form-control']
             ])
             ->add('content', TextareaType::class, [
                 'required' => true,
                 'label' => 'Содержимое',
-                'constraints' => [new Length(['min' => 3, 'max'=>255])],
+                'constraints' => [new Length(['min' => 3, 'max'=>255]),
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
                 'attr' => ['class ' => 'form-control']
             ])
             ->add('serialNumber', IntegerType::class, [
                 'required' => true,
                 'label' => 'Порядковый номер',
-                'attr' => ['class ' => 'form-control mb-2']
+                'attr' => ['class ' => 'form-control mb-2'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
             ])
             ->add('course', HiddenType::class, [
                 'data' => null,

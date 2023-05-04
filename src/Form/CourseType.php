@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Unique;
 
 class CourseType extends AbstractType
@@ -20,13 +21,15 @@ class CourseType extends AbstractType
             ->add('code', TextType::class, [
                 'required' => true,
                 'label' => 'Символьный код',
-                'constraints' => [new Length(['max'=>255])],
+                'constraints' => [new Length(['max'=>255]),
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
                 'attr' => ['class ' => 'form-control']
             ])
             ->add('name', TextType::class, [
                 'required' => true,
                 'label' => 'Название',
-                'constraints' => [new Length(['min' => 3, 'max'=>255])],
+                'constraints' => [new Length(['min' => 3, 'max'=>255]),
+                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
                 'attr' => ['class ' => 'form-control']
             ])
             ->add('description', TextareaType::class, [
