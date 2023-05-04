@@ -39,9 +39,18 @@
                 <a href="{{ path('app_course_index') }}" class="navbar-brand d-flex align-items-center">
                     <strong>Study-On</strong>
                 </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="true" aria-label="Toggle navigation">
+                    <div>
+                    {% if is_granted('ROLE_USER') %}
+                        <a class="btn btn-success" href="{{ path('app_user_profile') }}">Профиль</a>
+                        <a class="btn btn-secondary m-2" href="{{ path('app_logout') }}">Выйти</a>
+                    {% else %}
+                        <a class="btn btn-success" href="{{ path('app_registration') }}">Регистрация</a>
+                        <a class="btn btn-secondary m-2" href="{{ path('app_login') }}">Войти</a>
+                    {% endif %}
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="true" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                </div>
             </div>
         </div>
     </header>

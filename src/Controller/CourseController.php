@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Course;
 use App\Form\CourseType;
 use App\Repository\CourseRepository;
+use App\Security\User;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,18 +15,21 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/courses')]
 class CourseController extends AbstractController
 {
+
     #[Route('/', name: 'app_course_index', methods: ['GET'])]
     public function index(CourseRepository $courseRepository): Response
     {
 
         return $this->render('course/index.html.twig', [
             'courses' => $courseRepository->findAll(),
+
         ]);
     }
-
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/new', name: 'app_course_new', methods: ['GET', 'POST'])]
     public function new(Request $request, CourseRepository $courseRepository): Response
     {
+
         $course = new Course();
         $form = $this->createForm(CourseType::class, $course);
         $form->handleRequest($request);
@@ -47,12 +52,14 @@ class CourseController extends AbstractController
 
         return $this->render('course/show.html.twig', [
             'course' => $course,
+
         ]);
     }
-
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/{id}/edit', name: 'app_course_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Course $course, CourseRepository $courseRepository): Response
     {
+
         $form = $this->createForm(CourseType::class, $course);
         $form->handleRequest($request);
 
@@ -66,7 +73,7 @@ class CourseController extends AbstractController
             'form' => $form,
         ]);
     }
-
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[Route('/{id}', name: 'app_course_delete', methods: ['POST'])]
     public function delete(Request $request, Course $course, CourseRepository $courseRepository): Response
     {

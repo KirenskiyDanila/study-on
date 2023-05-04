@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Регистрация</h1>
+
+        {{ form_start(registrationForm) }}
+        {{ form_widget(registrationForm.email) }}
+        {{ form_errors(registrationForm.email) }}
+        {{ form_widget(registrationForm.password) }}
+
+        {{ form_errors(registrationForm) }}
+
+        <label for="registration_form_agreeTerms" class="mb-2 mt-2">Согласие на обработку персональных данных</label>
+        {{ form_widget(registrationForm.agreeTerms) }}
+        <br>
+        <button type="submit" class="btn mt-3 btn-success">Зарегистрироваться</button>
+        {{ form_end(registrationForm) }}
+    </div>
+{% endblock %}

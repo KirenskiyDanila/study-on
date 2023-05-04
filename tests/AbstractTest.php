@@ -31,6 +31,30 @@ abstract class AbstractTest extends WebTestCase
         return static::$client;
     }
 
+    protected static function authorizeUser($crawler, $client, $test): void
+    {
+        $form = $crawler->selectButton('Войти')->form(
+            [
+                'email' => 'user@gmail.com',
+                'password' => 'password'
+            ]
+        );
+        $client->submit($form);
+        $test->assertResponseRedirect();
+    }
+
+    protected static function authorizeAdmin($crawler, $client, $test): void
+    {
+        $form = $crawler->selectButton('Войти')->form(
+            [
+                'email' => 'admin@gmail.com',
+                'password' => 'password'
+            ]
+        );
+        $client->submit($form);
+        $test->assertResponseRedirect();
+    }
+
     protected function setUp(): void
     {
         static::getClient();
