@@ -28,7 +28,7 @@ class UserTest extends AbstractTest
 
         self::getClient()->getContainer()->set(
             BillingClient::class,
-            new BillingClientMock('')
+            new BillingClientMock()
         );
 
         return self::getClient();
@@ -296,22 +296,27 @@ class UserTest extends AbstractTest
         );
     }
 
-//    public function testSuccessfulRegistration(): void
-//    {
-//        $client = $this->setUpClient();
-//        $crawler = $client->request('GET', '/registration');
-//        $this->assertResponseOk();
-//
-//        $form = $crawler->selectButton('Зарегистрироваться')->form(
-//            [
-//                'user_registration_form[password][first]' => '12345678',
-//                'user_registration_form[password][second]' => '12345678',
-//                'user_registration_form[agreeTerms]' => true,
-//                'user_registration_form[email]' => 'user1231@gmail.com',
-//            ]
-//        );
-//        $client->submit($form);
-//        $this->assertResponseOk();
-//        self::assertPageTitleContains('Список курсов / StudyOn');
-//    }
+    public function testSuccessfulRegistration(): void
+    {
+        $client = $this->setUpClient();
+        $crawler = $client->request('GET', '/registration');
+        $this->assertResponseOk();
+
+        $form = $crawler->selectButton('Зарегистрироваться')->form(
+            [
+                'user_registration_form[password][first]' => '12345678',
+                'user_registration_form[password][second]' => '12345678',
+                'user_registration_form[agreeTerms]' => true,
+                'user_registration_form[email]' => 'user1231@gmail.com',
+            ]
+        );
+        $client->submit($form);
+        $this->assertResponseRedirect();
+        $crawler = $client->followRedirect();
+        self::assertPageTitleContains('Список курсов / StudyOn');
+        $crawler = $client->request('GET', '/profile');
+        $this->assertResponseOk();
+        self::assertSelectorExists('#email');
+        self::assertSelectorTextContains('#email', 'user1231@gmail.com');
+    }
 }

@@ -20,14 +20,14 @@ class UserController extends AbstractController
      */
     #[IsGranted('ROLE_USER')]
     #[Route('/profile', name: 'app_user_profile')]
-    public function index(): Response
+    public function index(BillingClient $billingClient): Response
     {
 
         /** @var User $user */
         $user = $this->getUser();
 
         try {
-            $response = BillingClient::getBillingUser($_ENV['BILLING_SERVER'], $user->getToken());
+            $response = $billingClient->getBillingUser($_ENV['BILLING_SERVER'], $user->getToken());
         } catch (BillingUnavailableException|JsonException $e) {
             throw new Exception('Произошла ошибка во время получения данных профиля: ' . $e->getMessage());
         }

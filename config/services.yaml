@@ -19,6 +19,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+
     App\Service\BillingClient:
         public: true
         autowire: true

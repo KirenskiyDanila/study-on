@@ -18,12 +18,12 @@ class CourseTest extends AbstractTest
 
     public function setUpClient()
     {
-//        self::getClient()->disableReboot();
-//
-//        self::getClient()->getContainer()->set(
-//            BillingClient::class,
-//            new BillingClientMock('')
-//        );
+        self::getClient()->disableReboot();
+
+        self::getClient()->getContainer()->set(
+            BillingClient::class,
+            new BillingClientMock('')
+        );
 
         return self::getClient();
     }

@@ -14,7 +14,7 @@ class BillingClientMock extends BillingClient
      * @throws BillingException
      * @throws JsonException
      */
-    public static function getToken(string $url, string $credentials, bool $register): array
+    public function getToken(string $url, string $credentials, bool $register): array
     {
         $arrayedCredentials = json_decode($credentials, true, 512, JSON_THROW_ON_ERROR);
         if ($register === false) {
@@ -24,7 +24,7 @@ class BillingClientMock extends BillingClient
                     && $arrayedCredentials['password'] === 'password')
             ) {
                 $token = base64_encode(json_encode([
-                    'username' => $arrayedCredentials['username'],
+                    'email' => $arrayedCredentials['username'],
                     'iat' => (new \DateTime('now'))->getTimestamp(),
                     'exp' => (new \DateTime('+ 1 hour'))->getTimestamp(),
                     'roles' => $arrayedCredentials['username'] === 'admin@gmail.com' ?
@@ -41,7 +41,7 @@ class BillingClientMock extends BillingClient
             && $arrayedCredentials['username'] !== 'user@gmail.com'
         ) {
             $token = base64_encode(json_encode([
-                'username' => $arrayedCredentials['username'],
+                'email' => $arrayedCredentials['username'],
                 'iat' => (new \DateTime('now'))->getTimestamp(),
                 'exp' => (new \DateTime('+ 1 hour'))->getTimestamp(),
                 'roles' => $arrayedCredentials['username'] === 'admin@gmail.com' ?
@@ -59,15 +59,15 @@ class BillingClientMock extends BillingClient
     /**
      * @throws JsonException
      */
-    public static function getBillingUser(string $url, string $token): array
+    public function getBillingUser(string $url, string $token): array
     {
         try {
             $parts = explode('.', $token);
             $payload = json_decode(base64_decode($parts[1]), true, 512, JSON_THROW_ON_ERROR);
             return [
                 'balance' => 0,
-                'roles' => $payload['roles'],
-                'username' => $payload['username'],
+                'ROLES' => $payload['roles'],
+                'username' => $payload['email'],
                 'code' => 200
             ];
         } catch (\Exception $e) {

@@ -58,7 +58,8 @@ class SecurityController extends AbstractController
     public function registration(
         Request $request,
         UserAuthenticatorInterface $authenticator,
-        BillingAuthenticator $formAuthenticator
+        BillingAuthenticator $formAuthenticator,
+        BillingClient $billingClient
     ): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_course_index');
@@ -79,7 +80,7 @@ class SecurityController extends AbstractController
 
 
             try {
-                $response = BillingClient::getToken($_ENV['BILLING_SERVER'], $credentials, true);
+                $response = $billingClient->getToken($_ENV['BILLING_SERVER'], $credentials, true);
             } catch (BillingUnavailableException|JsonException $e) {
                 throw new Exception('Произошла ошибка во время регистрации: ' . $e->getMessage());
             }

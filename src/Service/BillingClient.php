@@ -11,7 +11,7 @@ class BillingClient
      * @throws JsonException
      * @throws BillingUnavailableException
      */
-    public static function getToken(string $url, string $credentials, bool $register) : array
+    public function getToken(string $url, string $credentials, bool $register) : array
     {
         if ($register === true) {
             $uri = $url . 'api/v1/register';
@@ -43,7 +43,7 @@ class BillingClient
      * @throws BillingUnavailableException
      * @throws JsonException
      */
-    public static function getBillingUser(string $url, string $token): array
+    public function getBillingUser(string $url, string $token): array
     {
 
         $uri = $url . 'api/v1/users/current';

@@ -27,10 +27,13 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
+    private BillingClient $billingClient;
+
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
+    public function __construct(private UrlGeneratorInterface $urlGenerator, BillingClient $billingClient)
     {
+        $this->billingClient = $billingClient;
     }
 
     /**
@@ -49,7 +52,7 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
             return new SelfValidatingPassport(
                 new UserBadge($credentials, function ($credentials) {
                     try {
-                        $response = BillingClient::getToken($_ENV['BILLING_SERVER'], $credentials, false);
+                        $response = $this->billingClient->getToken($_ENV['BILLING_SERVER'], $credentials, false);
                     } catch (BillingUnavailableException|JsonException $e) {
                         throw new Exception('Произошла ошибка во время авторизации: ' . $e->getMessage());
                     }

@@ -4,6 +4,8 @@ namespace App\Tests;
 
 use App\Entity\Course;
 use App\Entity\Lesson;
+use App\Service\BillingClient;
+use App\Tests\Mock\BillingClientMock;
 use Exception;
 
 class LessonTest extends AbstractTest
@@ -15,12 +17,12 @@ class LessonTest extends AbstractTest
 
     public function setUpClient()
     {
-//        self::getClient()->disableReboot();
-//
-//        self::getClient()->getContainer()->set(
-//            BillingClient::class,
-//            new BillingClientMock('')
-//        );
+        self::getClient()->disableReboot();
+
+        self::getClient()->getContainer()->set(
+            BillingClient::class,
+            new BillingClientMock('')
+        );
 
         return self::getClient();
     }
@@ -195,7 +197,6 @@ class LessonTest extends AbstractTest
                 $highestNumber = $lesson->getSerialNumber();
             }
         }
-        // проверка на изменение порядкового номера с 12345678 на count + 1
         $this->assertEquals(count($course->getLessons()), $highestNumber);
     }
 
