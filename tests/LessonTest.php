@@ -7,6 +7,7 @@ use App\Entity\Lesson;
 use App\Service\BillingClient;
 use App\Tests\Mock\BillingClientMock;
 use Exception;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class LessonTest extends AbstractTest
 {
@@ -21,7 +22,7 @@ class LessonTest extends AbstractTest
 
         self::getClient()->getContainer()->set(
             BillingClient::class,
-            new BillingClientMock('')
+            new BillingClientMock(self::getClient()->getContainer()->get(TokenStorageInterface::class))
         );
 
         return self::getClient();

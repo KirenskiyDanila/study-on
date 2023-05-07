@@ -9,6 +9,26 @@ class User implements UserInterface
 {
     private ?string $email;
 
+    private ?string $refresh_token;
+
+    /**
+     * @return string|null
+     */
+    public function getRefreshToken(): ?string
+    {
+        return $this->refresh_token;
+    }
+
+    /**
+     * @param string|null $refresh_token
+     */
+    public function setRefreshToken(?string $refresh_token): self
+    {
+        $this->refresh_token = $refresh_token;
+
+        return $this;
+    }
+
     private ?DateTime $exp;
 
     /**

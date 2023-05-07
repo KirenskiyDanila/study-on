@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <p class="border border-3 rounded rounded-3 h1 text-center mt-2"> Ваши транзакции</p>
+        <table class="table table-dark mt-5">
+            <thead>
+            <tr>
+                <th scope="col">Номер транзакции</th>
+                <th scope="col">Время</th>
+                <th scope="col">Тип</th>
+                <th scope="col">Сумма</th>
+                <th scope="col">Код курса</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <th scope="row" class="{{ transaction.type == 'deposit' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.id }}
+                </th>
+                <td class="{{ transaction.type == 'deposit' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.created_at }}
+                </td>
+                <td class="{{ transaction.type == 'deposit' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.type }}
+                </td>
+                <td class="{{ transaction.type == 'deposit' ? 'text-bg-success' : 'text-bg-dark'}}">
+                    {{ transaction.amount }}
+                </td>
+                {% if transaction.course_code is defined and transaction.course_code is not empty %}
+                    <td class="text-bg-dark">{{ transaction.course_code }}</td>
+                {% else %}
+                    <td class="text-bg-success">---</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

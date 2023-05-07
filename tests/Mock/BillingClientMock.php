@@ -7,38 +7,28 @@ use App\Exception\BillingUnavailableException;
 use App\Security\User;
 use App\Service\BillingClient;
 use JsonException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class BillingClientMock extends BillingClient
 {
+    private TokenStorageInterface $tokenStorage;
+
+    public function __construct(TokenStorageInterface $tokenStorage)
+    {
+        parent::__construct();
+        $this->tokenStorage = $tokenStorage;
+    }
+
     /**
-     * @throws BillingException
      * @throws JsonException
      */
-    public function getToken(string $url, string $credentials, bool $register): array
+    public function auth(string $credentials): array
     {
         $arrayedCredentials = json_decode($credentials, true, 512, JSON_THROW_ON_ERROR);
-        if ($register === false) {
-            if (($arrayedCredentials['username'] === 'admin@gmail.com'
-                    && $arrayedCredentials['password'] === 'password')
-                || ($arrayedCredentials['username'] === 'user@gmail.com'
-                    && $arrayedCredentials['password'] === 'password')
-            ) {
-                $token = base64_encode(json_encode([
-                    'email' => $arrayedCredentials['username'],
-                    'iat' => (new \DateTime('now'))->getTimestamp(),
-                    'exp' => (new \DateTime('+ 1 hour'))->getTimestamp(),
-                    'roles' => $arrayedCredentials['username'] === 'admin@gmail.com' ?
-                        ['ROLE_SUPER_ADMIN'] : ['ROLE_USER'],
-                ], JSON_THROW_ON_ERROR));
-                $response['token'] = "header." . $token . ".verifySignature";
-                return $response;
-            }
-            $response['code'] = 401;
-            return $response;
-        }
-
-        if ($arrayedCredentials['username'] !== 'admin@gmail.com'
-            && $arrayedCredentials['username'] !== 'user@gmail.com'
+        if (($arrayedCredentials['username'] === 'admin@gmail.com'
+                && $arrayedCredentials['password'] === 'password')
+            || ($arrayedCredentials['username'] === 'user@gmail.com'
+                && $arrayedCredentials['password'] === 'password')
         ) {
             $token = base64_encode(json_encode([
                 'email' => $arrayedCredentials['username'],
@@ -48,6 +38,27 @@ class BillingClientMock extends BillingClient
                     ['ROLE_SUPER_ADMIN'] : ['ROLE_USER'],
             ], JSON_THROW_ON_ERROR));
             $response['token'] = "header." . $token . ".verifySignature";
+            $response['refresh_token'] = 'refresh_token';
+            return $response;
+        }
+        $response['code'] = 401;
+        return $response;
+    }
+
+    public function register(string $credentials): array
+    {
+        $arrayedCredentials = json_decode($credentials, true, 512, JSON_THROW_ON_ERROR);
+        if ($arrayedCredentials['username'] !== 'admin@gmail.com'
+            && $arrayedCredentials['username'] !== 'user@gmail.com'
+        ) {
+            $token = base64_encode(json_encode([
+                'email' => $arrayedCredentials['username'],
+                'iat' => (new \DateTime('now'))->getTimestamp(),
+                'exp' => (new \DateTime('+ 1 hour'))->getTimestamp(),
+                'roles' => ['ROLE_USER']
+            ], JSON_THROW_ON_ERROR));
+            $response['token'] = "header." . $token . ".verifySignature";
+            $response['refresh_token'] = 'refresh_token';
             return $response;
         }
 
@@ -56,10 +67,23 @@ class BillingClientMock extends BillingClient
         return $response;
     }
 
+    public function refresh(string $refreshToken): array
+    {
+        $user = $this->tokenStorage->getToken()->getUser();
+        $token = base64_encode(json_encode([
+            'email' => $user->getUserIdentifier(),
+            'iat' => (new \DateTime('now'))->getTimestamp(),
+            'exp' => (new \DateTime('+ 1 hour'))->getTimestamp(),
+            'roles' => ['ROLE_USER'],
+        ], JSON_THROW_ON_ERROR));
+        $response['token'] = "header." . $token . ".verifySignature";
+        return $response;
+    }
+
     /**
      * @throws JsonException
      */
-    public function getBillingUser(string $url, string $token): array
+    public function getBillingUser(string $token): array
     {
         try {
             $parts = explode('.', $token);

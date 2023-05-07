@@ -22,17 +22,33 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 
 class SecurityController extends AbstractController
 {
+    private BillingClient $billingClient;
+    private AuthenticationUtils $authenticationUtils;
+    private BillingAuthenticator $billingAuthenticator;
+    private UserAuthenticatorInterface $authenticator;
+    public function __construct(
+        BillingClient $billingClient,
+        AuthenticationUtils $authenticationUtils,
+        BillingAuthenticator $billingAuthenticator,
+        UserAuthenticatorInterface $authenticator
+    ) {
+        $this->billingClient = $billingClient;
+        $this->authenticator = $authenticator;
+        $this->authenticationUtils = $authenticationUtils;
+        $this->billingAuthenticator = $billingAuthenticator;
+    }
+
     #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(): Response
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_course_index');
         }
 
         // get the login error if there is one
-        $error = $authenticationUtils->getLastAuthenticationError();
+        $error = $this->authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $lastUsername = $this->authenticationUtils->getLastUsername();
 
         return $this->render(
             'security/login.html.twig',
@@ -56,10 +72,7 @@ class SecurityController extends AbstractController
      */
     #[Route(path: '/registration', name: 'app_registration')]
     public function registration(
-        Request $request,
-        UserAuthenticatorInterface $authenticator,
-        BillingAuthenticator $formAuthenticator,
-        BillingClient $billingClient
+        Request $request
     ): Response {
         if ($this->getUser()) {
             return $this->redirectToRoute('app_course_index');
@@ -80,7 +93,7 @@ class SecurityController extends AbstractController
 
 
             try {
-                $response = $billingClient->getToken($_ENV['BILLING_SERVER'], $credentials, true);
+                $response = $this->billingClient->register($credentials);
             } catch (BillingUnavailableException|JsonException $e) {
                 throw new Exception('Произошла ошибка во время регистрации: ' . $e->getMessage());
             }
@@ -91,11 +104,12 @@ class SecurityController extends AbstractController
             } else {
                 $user = new User();
                 $user->setToken($response['token']);
+                $user->setRefreshToken($response['refresh_token']);
                 $user->decodeToken();
 
-                return $authenticator->authenticateUser(
+                return $this->authenticator->authenticateUser(
                     $user,
-                    $formAuthenticator,
+                    $this->billingAuthenticator,
                     $request
                 );
             }

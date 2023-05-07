@@ -52,7 +52,7 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
             return new SelfValidatingPassport(
                 new UserBadge($credentials, function ($credentials) {
                     try {
-                        $response = $this->billingClient->getToken($_ENV['BILLING_SERVER'], $credentials, false);
+                        $response = $this->billingClient->auth($credentials);
                     } catch (BillingUnavailableException|JsonException $e) {
                         throw new Exception('Произошла ошибка во время авторизации: ' . $e->getMessage());
                     }
@@ -61,6 +61,7 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
                     }
                     $user = new User();
                     $user->setToken($response['token']);
+                    $user->setRefreshToken($response['refresh_token']);
                     $user->decodeToken();
                     return $user;
                 }),
