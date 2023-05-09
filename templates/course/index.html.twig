@@ -9,23 +9,42 @@
         {% for course in courses %}
                 <div class="card  m-2 col-3" style="width: 35rem;">
                     <div class="card-body">
-                        <a href="{{ path('app_course_show', {'id': course.id}) }}">
-                            <h5 class="card-title text-muted">{{ course.name }}</h5>
+                        <a href="{{ path('app_course_show', {'id': course.content.id}) }}">
+                            <h5 class="card-title text-muted">{{ course.content.title }}</h5>
                         </a>
-                        {% if course.lessons | length | number_format(1) >= 5 or course.lessons | length | number_format(2) == 11 %}
-                        <h6 class="card-subtitle mb-2 text-muted">{{ course.lessons | length }} уроков </h6>
-                        {% elseif course.lessons | length | number_format(1) >= 2 %}
-                        <h6 class="card-subtitle mb-2 text-muted">{{ course.lessons | length }} урока </h6>
+                        {% if course.content.lessons | length | number_format(1) >= 5
+                            or course.content.lessons | length | number_format(2) == 11
+                        %}
+                        <h6 class="card-subtitle mb-2 text-muted">{{ course.content.lessons | length }} уроков </h6>
+                        {% elseif course.content.lessons | length | number_format(1) >= 2 %}
+                        <h6 class="card-subtitle mb-2 text-muted">{{ course.content.lessons | length }} урока </h6>
                         {% else  %}
-                        <h6 class="card-subtitle mb-2 text-muted">{{ course.lessons | length }} урок</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ course.content.lessons | length }} урок</h6>
                         {% endif %}
-                        <p class="card-text">{{ course.description }}</p>
+                        <p class="card-text">{{ course.content.description }}</p>
                         {% if is_granted('ROLE_USER') %}
-                            {% if transactions[course.code] is defined and transactions[course.code] is not empty  %}
-                                {% if transactions[course.code]['type'] == 'buy' %}
+                            {% if transactions[course.content.code] is defined
+                                and transactions[course.content.code] is not empty %}
+                                {% if transactions[course.content.code]['type'] == 'buy' %}
                                     <h6 class="card-subtitle mb-2 text-success h3">Курс куплен</h6>
-                                {% elseif transactions[course.code]['type'] == 'rent' %}
-                                    <h6 class="card-subtitle mb-2 text-success h3">Курс аредован до {{ transactions[course.code]['expires_at']|date }}</h6>
+                                {% elseif transactions[course.content.code]['type'] == 'rent' %}
+                                    <h6 class="card-subtitle mb-2 text-success h3">
+                                        Курс аредован до {{ transactions[course.content.code]['expires_at']|date }}
+                                    </h6>
+                                {% endif %}
+                            {% else %}
+                                {% if course.type == 'free' %}
+                                    <h6 class="card-subtitle mb-2 text-success h3">Курс бесплатный</h6>
+                                {% else %}
+                                    {% if course.type == 'rent' %}
+                                         <h6 class="card-subtitle mb-2 text-success h3">
+                                             Цена аренды: {{ course.price }}
+                                         </h6>
+                                    {% elseif course.type == 'buy' %}
+                                         <h6 class="card-subtitle mb-2 text-success h3">
+                                             Цена покупки: {{ course.price }}
+                                         </h6>
+                                    {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% endif %}

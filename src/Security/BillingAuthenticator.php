@@ -9,11 +9,15 @@ use JsonException;
 use PHPUnit\Util\Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
@@ -26,14 +30,17 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 class BillingAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
-
+    private UrlGeneratorInterface $urlGenerator;
     private BillingClient $billingClient;
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator, BillingClient $billingClient)
-    {
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        BillingClient $billingClient
+    ) {
         $this->billingClient = $billingClient;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
@@ -57,7 +64,7 @@ class BillingAuthenticator extends AbstractLoginFormAuthenticator
                         throw new Exception('Произошла ошибка во время авторизации: ' . $e->getMessage());
                     }
                     if (isset($response['code'])) {
-                        throw new BillingException('Ошибка авторизации. Проверьте правильность данных!', 401);
+                        throw new AuthenticationException($response['message']);
                     }
                     $user = new User();
                     $user->setToken($response['token']);

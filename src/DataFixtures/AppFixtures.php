@@ -13,7 +13,7 @@ class AppFixtures extends Fixture
     {
         $course1 = new Course();
 
-        $course1->setName('ИТ-инженер');
+        $course1->setTitle('ИТ-инженер');
         $course1->setCode('course-1');
         $course1->setDescription('Станьте ИТ-инженером и получите одну из самых востребованных профессий.' .
             'Вы изучите основы программирования и основные концепции 
@@ -65,7 +65,7 @@ class AppFixtures extends Fixture
 
         $course2 = new Course();
 
-        $course2->setName('Профессия Графический дизайнер');
+        $course2->setTitle('Профессия Графический дизайнер');
         $course2->setCode('course-2');
         $course2->setDescription('Вы с нуля получите востребованную профессию на стыке' .
             'творчества и IT. Научитесь работать в популярных графических' .
@@ -145,7 +145,7 @@ class AppFixtures extends Fixture
 
         $course3 = new Course();
 
-        $course3->setName('Профессия Бухгалтер');
+        $course3->setTitle('Профессия Бухгалтер');
         $course3->setCode('course-3');
         $course3->setDescription('Вы с нуля научитесь вести бухучёт по российским стандартам' .
             'и работать в 1С, готовить налоговую отчётность и рассчитывать' .

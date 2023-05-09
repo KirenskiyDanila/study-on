@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ course.name }} / StudyOn{% endblock %}
+{% block title %}{{ course.title }} / StudyOn{% endblock %}
 
 {% block body %}
 <div class="container">
-    <h1>Редактирование курса "{{ course.name }}"</h1>
+    <h1>Редактирование курса "{{ course.title }}"</h1>
 
     {{ include('course/_form.html.twig', {'button_label': 'Редактировать'}) }}
 

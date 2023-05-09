@@ -5,7 +5,11 @@
 {% block body %}
     <div class="container">
         <h1>{{ lesson.name }}</h1>
-        <h3><a class="text-decoration-none text-black" href="{{ path('app_course_show', {'id': lesson.course.id}) }}">Курс: {{ lesson.course.name }}</a></h3>
+        <h3>
+            <a class="text-decoration-none text-black" href="{{ path('app_course_show', {'id': lesson.course.id}) }}">
+                Курс: {{ lesson.course.title }}
+            </a>
+        </h3>
         <div class="h5 p-1">
             {{ lesson.content }}
         </div>

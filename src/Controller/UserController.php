@@ -6,6 +6,7 @@ use App\Exception\BillingException;
 use App\Exception\BillingUnavailableException;
 use App\Security\User;
 use App\Service\BillingClient;
+use App\Utils\FilterFormer;
 use JsonException;
 use PHPUnit\Util\Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -18,9 +19,11 @@ class UserController extends AbstractController
 {
 
     private BillingClient $billingClient;
-    public function __construct(BillingClient $billingClient)
+    private FilterFormer $filterFormer;
+    public function __construct(BillingClient $billingClient, FilterFormer $filterFormer)
     {
         $this->billingClient = $billingClient;
+        $this->filterFormer= $filterFormer;
     }
 
     /**
@@ -61,16 +64,7 @@ class UserController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $filter = array();
-        if ($request->query->get("type", null) !== null) {
-            $filter['type'] = $request->query->get("type", null);
-        }
-        if ($request->query->get("course_code", null) !== null) {
-            $filter['course_code'] = $request->query->get("course_code", null);
-        }
-        if ($request->query->get("skip_expired", null) !== null) {
-            $filter['skip_expired'] = $request->query->get("skip_expired", null);
-        }
+        $filter = $this->filterFormer->formFilter($request);
         try {
             $response = $this->billingClient->getTransactions($user->getToken(), $filter);
         } catch (BillingUnavailableException|JsonException $e) {

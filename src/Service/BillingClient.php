@@ -49,6 +49,27 @@ class BillingClient
      * @throws BillingUnavailableException
      * @throws JsonException
      */
+    public function getCourse(string $code) : array
+    {
+        $uri = $this->url . 'api/v1/courses/' . $code;
+        return CurlMaker::get($uri);
+    }
+
+    /**
+     * @throws BillingUnavailableException
+     * @throws JsonException
+     */
+    public function getCourses() : array
+    {
+        $uri = $this->url . 'api/v1/courses';
+        return CurlMaker::get($uri);
+    }
+
+
+    /**
+     * @throws BillingUnavailableException
+     * @throws JsonException
+     */
     public function getBillingUser(string $token): array
     {
 
@@ -74,5 +95,25 @@ class BillingClient
     {
         $uri = $this->url . 'api/v1/courses/' . $code . '/pay';
         return CurlMaker::post($uri, null, $token);
+    }
+
+    /**
+     * @throws BillingUnavailableException
+     * @throws JsonException
+     */
+    public function addCourse(string $token, string $postFields): array
+    {
+        $uri = $this->url . 'api/v1/courses/';
+        return CurlMaker::post($uri, $postFields, $token);
+    }
+
+    /**
+     * @throws BillingUnavailableException
+     * @throws JsonException
+     */
+    public function editCourse(string $token, string $postFields, string $code): array
+    {
+        $uri = $this->url . 'api/v1/courses/' . $code;
+        return CurlMaker::post($uri, $postFields, $token);
     }
 }
