@@ -46,6 +46,7 @@ class CourseType extends AbstractType
                     'Аренда курса' => 'rent',
                     'Бесплатный курс' => 'free'
                 ],
+                'invalid_message' => 'Выберите правильный тип оплаты!',
                 'required' => true,
                 'mapped' => false,
                 'label' => 'Тип оплаты',

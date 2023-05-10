@@ -49,6 +49,7 @@ class CourseController extends AbstractController
         $courseResponse = $this->billingClient->getCourses();
         $coursesArray = $this->responseParser->parseCourses($courseResponse, $courses);
 
+
         if ($this->getUser() !== null) {
             $user = $this->getUser();
             $transactionResponse = $this->billingClient->getTransactions(
@@ -103,7 +104,11 @@ class CourseController extends AbstractController
                 }
             } elseif (isset($response['success'])) {
                 $this->courseRepository->save($course, true);
-                return $this->redirectToRoute('app_course_show', ['id' => $course->getId()], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute(
+                    'app_course_show',
+                    ['id' => $course->getId()],
+                    Response::HTTP_SEE_OTHER
+                );
             }
         }
 
@@ -126,21 +131,25 @@ class CourseController extends AbstractController
         if ($this->getUser() !== null) {
             $user = $this->getUser();
             $courseBilling = $this->billingClient->getCourse($course->getCode());
-            if ($courseBilling['type'] === 'free') {
-                $owned = true;
-            } else {
-                $transactions = $this->billingClient->getTransactions(
-                    $user->getToken(),
-                    ['skip_expired' => true, 'course_code' => $course->getCode()]
-                );
-                if (isset($transactions[0])) {
+            if (isset($courseBilling['type'])) {
+                if ($courseBilling['type'] === 'free') {
                     $owned = true;
                 } else {
-                    $currentUser = $this->billingClient->getBillingUser($user->getToken());
-                    if ($currentUser['balance'] >= $courseBilling['price']) {
-                        $disabled = false;
+                    $transactions = $this->billingClient->getTransactions(
+                        $user->getToken(),
+                        ['skip_expired' => true, 'course_code' => $course->getCode()]
+                    );
+                    if (isset($transactions[0])) {
+                        $owned = true;
+                    } else {
+                        $currentUser = $this->billingClient->getBillingUser($user->getToken());
+                        if ($currentUser['balance'] >= $courseBilling['price']) {
+                            $disabled = false;
+                        }
                     }
                 }
+            } else {
+                $owned = true;
             }
         }
 
@@ -229,8 +238,12 @@ class CourseController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         try {
-            $this->billingClient->buyCourse($user->getToken(), $course->getCode());
-            $this->addFlash('success', 'Курс успешно оплачен');
+            $response = $this->billingClient->buyCourse($user->getToken(), $course->getCode());
+            if (isset($response['code'])) {
+                $this->addFlash('error', $response['message']);
+            } else {
+                $this->addFlash('success', 'Курс успешно оплачен');
+            }
         } catch (BillingUnavailableException| \Exception $e) {
             $this->addFlash('error', $e->getMessage());
         }

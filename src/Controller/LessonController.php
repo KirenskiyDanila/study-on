@@ -72,12 +72,19 @@ class LessonController extends AbstractController
     public function show(Lesson $lesson): Response
     {
         $user = $this->getUser();
-        $response = $this->billingClient->getTransactions(
-            $user->getToken(),
-            ['skip_expired' => true, 'course_code' => $lesson->getCourse()->getCode()]
-        );
-        if (!isset($response[0])) {
-            throw new AccessDeniedException('Вы должны приобрести курс!');
+
+        $billingCourse = $this->billingClient->getCourse($lesson->getCourse()->getCode());
+
+        if (isset($billingCourse['type'])) {
+            if ($billingCourse['type'] !== 'free') {
+                $response = $this->billingClient->getTransactions(
+                    $user->getToken(),
+                    ['skip_expired' => true, 'course_code' => $lesson->getCourse()->getCode()]
+                );
+                if (!isset($response[0])) {
+                    throw new AccessDeniedException('Вы должны приобрести курс!');
+                }
+            }
         }
 
 

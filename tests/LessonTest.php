@@ -78,7 +78,7 @@ class LessonTest extends AbstractTest
     /**
      * @throws Exception
      */
-    public function testGetCourseMethod(): void
+    public function testGetLesson(): void
     {
         $client = $this->setUpClient();
         $crawler = $client->request('GET', '/login');
@@ -140,7 +140,7 @@ class LessonTest extends AbstractTest
         $this->assertResponseCode(303);
         $crawler = self::getClient()->followRedirect();
         $this->assertResponseOk();
-        self::assertPageTitleContains($course->getName() .' / StudyOn');
+        self::assertPageTitleContains($course->getTitle() .' / StudyOn');
         $this->assertCount($count + 1, $crawler->filter('.list-group-item'));
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $lessons = $course->getLessons();
@@ -189,7 +189,7 @@ class LessonTest extends AbstractTest
         self::getClient()->followRedirect();
         $this->assertResponseOk();
         self::getClient()->getCrawler();
-        self::assertPageTitleContains('123456 / '.$course->getName() .' / StudyOn');
+        self::assertPageTitleContains('123456 / '.$course->getTitle() .' / StudyOn');
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $lessons = $course->getLessons();
         $highestNumber = 0;
@@ -219,7 +219,7 @@ class LessonTest extends AbstractTest
         $this->assertResponseCode(303);
         self::getClient()->followRedirect();
         $this->assertResponseOk();
-        self::assertPageTitleContains($course->getName() . ' / StudyOn');
+        self::assertPageTitleContains($course->getTitle() . ' / StudyOn');
         $course = self::getEntityManager()->getRepository(Course::class)->findAll()[0];
         $this->assertEquals(count($course->getLessons()), $count - 1);
     }

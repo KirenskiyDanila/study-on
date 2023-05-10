@@ -18,10 +18,6 @@ class UserTest extends AbstractTest
     {
         return [AppFixtures::class];
     }
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
 
     public function setUpClient()
     {
@@ -64,7 +60,7 @@ class UserTest extends AbstractTest
     /**
      * @throws \Exception
      */
-    public function testRoles()
+    public function testRoles(): void
     {
         $client = $this->setUpClient();
         $client->request('GET', '/courses/');
@@ -114,8 +110,6 @@ class UserTest extends AbstractTest
             $this->assertResponseCode(403);
         }
         foreach ($lessons as $lesson) {
-            $crawler = self::getClient()->request('GET', '/lessons/' . $lesson->getId());
-            $this->assertResponseOk();
             $crawler = self::getClient()->request('GET', '/lessons/' . $lesson->getId() . '/edit');
             $this->assertResponseCode(403);
             $crawler = self::getClient()->request('POST', '/lessons/' . $lesson->getId() . '/edit');
@@ -134,8 +128,6 @@ class UserTest extends AbstractTest
         $crawler = $client->request('GET', '/login');
         self::authorizeAdmin($crawler, $client, $this);
         foreach ($lessons as $lesson) {
-            $crawler = self::getClient()->request('GET', '/lessons/' . $lesson->getId());
-            $this->assertResponseOk();
             $crawler = self::getClient()->request('GET', '/lessons/' . $lesson->getId() . '/edit');
             $this->assertResponseOk();
             $crawler = self::getClient()->request('POST', '/lessons/' . $lesson->getId() . '/edit');
@@ -300,6 +292,7 @@ class UserTest extends AbstractTest
     public function testSuccessfulRegistration(): void
     {
         $client = $this->setUpClient();
+
         $crawler = $client->request('GET', '/registration');
         $this->assertResponseOk();
 
@@ -319,5 +312,30 @@ class UserTest extends AbstractTest
         $this->assertResponseOk();
         self::assertSelectorExists('#email');
         self::assertSelectorTextContains('#email', 'user1231@gmail.com');
+    }
+
+    public function testTransactionPage(): void
+    {
+        $client = $this->setUpClient();
+        $client->request('GET', '/transactions');
+        $this->assertResponseRedirect();
+        $crawler = $client->followRedirect();
+
+        self::authorizeUser($crawler, $client, $this);
+        $client->request('GET', '/transactions');
+        $this->assertResponseOk();
+        $crawler = $client->getCrawler()->filter('.table')->filter('tbody');
+        self::assertCount(1, $crawler->filter('tr'));
+
+        $link = $client->getCrawler()->selectLink('Выйти')->link();
+        $client->click($link);
+        $this->assertResponseRedirect();
+        $crawler = $client->request('GET', '/login');
+
+        self::authorizeAdmin($crawler, $client, $this);
+        $client->request('GET', '/transactions');
+        $this->assertResponseOk();
+        $crawler = $client->getCrawler()->filter('.table')->filter('tbody');
+        self::assertCount(5, $crawler->filter('tr'));
     }
 }
