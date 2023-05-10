@@ -15,6 +15,10 @@ security:
             lazy: true
             provider: app_user_provider
             custom_authenticator: App\Security\BillingAuthenticator
+            remember_me:
+                secret: '%kernel.secret%' # required
+                lifetime: 604800 # 1 week in seconds
+                signature_properties: ['email']
             logout:
                 path: app_logout
                 # where to redirect after logout
