@@ -13,9 +13,17 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserRegistrationFormType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -23,13 +31,21 @@ class UserRegistrationFormType extends AbstractType
                 'label' => 'Электронная почта',
                 'attr' => [
                     'class' => 'form-control mb-3',
-                    'placeholder' => 'Введите вашу электронную почту...',
+                    'placeholder' => $this->translator->trans(
+                        'placeholders.email',
+                        [],
+                        'messages'
+                    ),
                 ],
                 'constraints' => [
                     new Email([
-                    'message' => 'Электронная почта неправильно заполнена.',
-        ]),
-    ],
+                    'message' => $this->translator->trans(
+                        'errors.register.email.format',
+                        [],
+                        'messages'
+                    ),
+                    ]),
+                ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
 
@@ -41,13 +57,21 @@ class UserRegistrationFormType extends AbstractType
                 ],
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'Вы должны согласиться с правилами пользования.',
+                        'message' => $this->translator->trans(
+                            'errors.register.agreeTerms.isTrue',
+                            [],
+                            'messages'
+                        ),
                     ]),
                 ],
             ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'invalid_message' => 'Пароли должны совпадать.',
+                'invalid_message' => $this->translator->trans(
+                    'errors.register.password.repeat',
+                    [],
+                    'messages'
+                ),
                 'mapped' => false,
                 'options' => ['attr' => ['class' => 'password-field']],
                 'required' => true,
@@ -57,14 +81,26 @@ class UserRegistrationFormType extends AbstractType
                         [
                         'autocomplete' => 'new-password',
                         'class' => 'form-control mb-3',
-                        'placeholder' => 'Введите ваш пароль...'],
+                        'placeholder' => $this->translator->trans(
+                            'placeholders.firstPassword',
+                            [],
+                            'messages'
+                        )],
                         'constraints' => [
                             new NotBlank([
-                                'message' => 'Пожалуйста, введите пароль',
+                                'message' => $this->translator->trans(
+                                    'errors.register.password.blank',
+                                    [],
+                                    'messages'
+                                ),
                             ]),
                             new Length([
                                 'min' => 6,
-                                'minMessage' => 'Ваш пароль должен состоять из минимум {{ limit }} символов',
+                                'minMessage' => $this->translator->trans(
+                                    'errors.register.password.minLength',
+                                    [],
+                                    'messages'
+                                ),
                                 // max length allowed by Symfony for security reasons
                                 'max' => 4096,
                             ])
@@ -76,7 +112,11 @@ class UserRegistrationFormType extends AbstractType
                         [
                         'autocomplete' => 'new-password',
                         'class' => 'form-control mb-3',
-                        'placeholder' => 'Повторите пароль...' ],
+                        'placeholder' => $this->translator->trans(
+                            'placeholders.secondPassword',
+                            [],
+                            'messages'
+                        ) ],
                 ]
             ])
         ;

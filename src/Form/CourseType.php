@@ -17,24 +17,55 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Unique;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CourseType extends AbstractType
 {
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('code', TextType::class, [
                 'required' => true,
                 'label' => 'Символьный код',
-                'constraints' => [new Length(['max'=>255]),
-                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
+                'constraints' => [new Length(['max'=>255,
+                    'maxMessage' => $this->translator->trans(
+                        'errors.course.code.length',
+                        [],
+                        'messages'
+                    )]),
+                    new NotBlank(['message' => $this->translator->trans(
+                        'errors.course.code.blank',
+                        [],
+                        'messages'
+                    )])],
                 'attr' => ['class ' => 'form-control']
             ])
             ->add('title', TextType::class, [
                 'required' => true,
                 'label' => 'Название',
-                'constraints' => [new Length(['min' => 3, 'max'=>255]),
-                    new NotBlank(['message' => 'Поле не должно быть пустым!'])],
+                'constraints' => [new Length(['min' => 3, 'max'=>255,
+                    'minMessage' => $this->translator->trans(
+                        'errors.course.title.minLength',
+                        [],
+                        'messages'
+                    ),
+                    'maxMessage' => $this->translator->trans(
+                        'errors.course.title.maxLength',
+                        [],
+                        'messages'
+                    )]),
+                    new NotBlank(['message' => $this->translator->trans(
+                        'errors.course.title.blank',
+                        [],
+                        'messages'
+                    )])],
                 'attr' => ['class ' => 'form-control']
             ])
             ->add('description', TextareaType::class, [
@@ -46,13 +77,27 @@ class CourseType extends AbstractType
                     'Аренда курса' => 'rent',
                     'Бесплатный курс' => 'free'
                 ],
-                'invalid_message' => 'Выберите правильный тип оплаты!',
+                'invalid_message'=> $this->translator->trans(
+                    'errors.course.type.choice',
+                    [],
+                    'messages'
+                ),
                 'required' => true,
                 'mapped' => false,
                 'label' => 'Тип оплаты',
                 'attr' => ['class ' => 'form-control'],
-                'constraints' => [new NotBlank(['message' => 'Поле не должно быть пустым!']),
-                    new Choice(['message' => 'Выберите правильный тип оплаты!',
+                'constraints' => [new NotBlank([
+                    'message' => $this->translator->trans(
+                        'errors.course.type.blank',
+                        [],
+                        'messages'
+                    )]),
+                    new Choice([
+                        'message' => $this->translator->trans(
+                            'errors.course.type.choice',
+                            [],
+                            'messages'
+                        ),
                         'choices' => ['buy', 'rent', 'free']
                         ])]
             ])
@@ -62,7 +107,11 @@ class CourseType extends AbstractType
                 'label' => 'Цена курса',
                 'attr' => ['class ' => 'form-control mb-2'],
                 'constraints' => [
-                    new PositiveOrZero(['message' => 'Курс не может стоить меньше 0!'])]
+                    new PositiveOrZero(['message' => $this->translator->trans(
+                        'errors.course.price.positiveOrZero',
+                        [],
+                        'messages'
+                    )])]
             ])
         ;
     }
